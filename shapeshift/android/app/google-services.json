@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "901392783365",
+    "project_id": "shapeshift-ccbf5",
+    "storage_bucket": "shapeshift-ccbf5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:901392783365:android:af2a13b13e38978629e46c",
+        "android_client_info": {
+          "package_name": "com.example.shapeshift"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "901392783365-47orag5riglfs9e17on59957mkubd7l9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiC_X4ZiNoh519CtAmLJ4Tr6iTt6Z7jBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "901392783365-47orag5riglfs9e17on59957mkubd7l9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

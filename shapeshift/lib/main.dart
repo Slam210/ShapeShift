@@ -1,115 +1,314 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
-void main() {
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Firebase Assignment',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const StartPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class StartPage extends StatelessWidget {
+  const StartPage({Key? key}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  Future<void> _checkLocationPermission(BuildContext context) async {
+    _navigateToLogin(context);
+  }
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  void _navigateToLogin(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SignInPage()),
+    );
+  }
 
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _navigateToSignup(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SignupPage()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Start Page'),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            ElevatedButton(
+              onPressed: () => _checkLocationPermission(context),
+              child: const Text('Log In'),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _navigateToSignup(context),
+              child: const Text('Sign Up'),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class SignInPage extends StatefulWidget {
+  const SignInPage({Key? key}) : super(key: key);
+
+  @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sign In'),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+              ),
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your email';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+              obscureText: true,
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your password';
+                }
+                return null;
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Sign In'),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  try {
+                    await _auth.signInWithEmailAndPassword(
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            HomePage(email: _emailController.text),
+                      ),
+                    );
+                  } catch (e) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Error'),
+                          content: Text(e.toString()),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SignupPage extends StatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
+
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final _formKey = GlobalKey<FormState>();
+  late String _email, _password, _username;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sign Up'),
+      ),
+      body: Center(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                validator: (input) {
+                  if (input!.isEmpty) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(labelText: 'Email'),
+                onSaved: (input) => _email = input!,
+              ),
+              TextFormField(
+                validator: (input) {
+                  if (input!.isEmpty) {
+                    return 'Please enter a valid username';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(labelText: 'Username'),
+                onSaved: (input) => _username = input!,
+              ),
+              TextFormField(
+                validator: (input) {
+                  if (input!.length < 6) {
+                    return 'Your password must be at least 6 characters';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                onSaved: (input) => _password = input!,
+              ),
+              ElevatedButton(
+                onPressed: signUp,
+                child: const Text('Sign Up'),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void signUp() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState?.save();
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: _email, password: _password);
+        User? user = userCredential.user;
+        if (user != null) {
+          user.updateDisplayName(_username);
+        }
+        FirebaseFirestore.instance.collection('users').doc(user!.uid).set(
+            {'username': _username, 'email': _email, 'password': _password});
+        Navigator.pop(context); // Return to homepage after signing up
+      } catch (e) {
+        if (kDebugMode) {
+          print(e.toString());
+        }
+      }
+    }
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key, required this.email}) : super(key: key);
+
+  final String email;
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String _username = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername();
+  }
+
+  void _fetchUsername() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: widget.email)
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      final userData = snapshot.docs.first.data();
+      setState(() {
+        _username = userData['username'];
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home Page of: $_username'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
+                );
+              },
+              child: const Text('Log Out'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
