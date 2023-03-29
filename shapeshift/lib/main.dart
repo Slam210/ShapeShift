@@ -232,6 +232,26 @@ class _SignupPageState extends State<SignupPage> {
       ),
     );
   }
+  class OtherPage extends StatelessWidget { //soon i will put more here lol
+  const OtherPage({Key? key, required this.title}) : super(key: key);
+  final String title;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: Center(
+        child: TextButton(
+          onPressed: () {
+            //Navigator.of(context).pop();
+          },
+          child: const Text('Go Back'),
+        ),
+      ),
+    );
+  }
+}
 
   void signUp() async {
     if (_formKey.currentState!.validate()) {
