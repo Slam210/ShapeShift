@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Assignment',
+      title: 'ShapeShift',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -105,7 +105,7 @@ class _SignInPageState extends State<SignInPage> {
               ),
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return 'Please enter your email';
+                  return 'Please enter your email.';
                 }
                 return null;
               },
@@ -118,7 +118,7 @@ class _SignInPageState extends State<SignInPage> {
               obscureText: true,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return 'Please enter your password';
+                  return 'Please enter your password.';
                 }
                 return null;
               },
@@ -144,7 +144,7 @@ class _SignInPageState extends State<SignInPage> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: const Text('Error'),
+                          title: const Text('Something went wrong.'),
                           content: Text(e.toString()),
                           actions: <Widget>[
                             ElevatedButton(
