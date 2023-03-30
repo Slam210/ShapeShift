@@ -15,13 +15,69 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ShapeShift',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        visualDensity: VisualDensity.standard,
+        primaryColorBrightness: Brightness.dark,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              if (states.contains(MaterialState.hovered)) return Colors.grey;
+              return null;
+            }),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              if (states.contains(MaterialState.hovered)) return Colors.grey;
+              return null;
+            }),
+          ),
+        ),
+        primarySwatch: Colors.red,
+        primaryColor: Colors.red,
+        primaryColorLight: Colors.red,
+        primaryColorDark: Colors.red,
+        accentColor: Colors.redAccent,
+        shadowColor: Colors.red,
+        bottomAppBarColor: Colors.red,
+        cardColor: Colors.red,
+        hoverColor: Colors.red,
+        highlightColor: Colors.red,
+        dialogBackgroundColor: Colors.red,
+        indicatorColor: Colors.red,
+        errorColor: Colors.red,
+        toggleableActiveColor: Colors.red,
+        textTheme: TextTheme(
+          displayLarge: TextStyle(
+            color: Colors.red,
+          ),
+          displayMedium: TextStyle(
+            color: Colors.grey,
+          ),
+          displaySmall: TextStyle(
+            color: Colors.red,
+          ),
+          headlineMedium: TextStyle(
+            color: Colors.grey,
+          ),
+          headlineSmall: TextStyle(
+            color: Colors.red,
+          ),
+          titleLarge: TextStyle(
+            color: Colors.grey,
+          ),
+          bodySmall: TextStyle(
+            color: Colors.grey,
+          ),
+        ),
       ),
       home: const StartPage(),
     );
@@ -232,26 +288,6 @@ class _SignupPageState extends State<SignupPage> {
       ),
     );
   }
-  class OtherPage extends StatelessWidget { //soon i will put more here lol
-  const OtherPage({Key? key, required this.title}) : super(key: key);
-  final String title;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: TextButton(
-          onPressed: () {
-            //Navigator.of(context).pop();
-          },
-          child: const Text('Go Back'),
-        ),
-      ),
-    );
-  }
-}
 
   void signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -325,6 +361,43 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               child: const Text('Log Out'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OtherPage()),
+                );
+              },
+              child: const Text('Go to Other Page'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OtherPage extends StatelessWidget {
+  const OtherPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Other Page (under construction)'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('This will be cool in a few weeks.'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Back to Home Page'),
             ),
           ],
         ),
