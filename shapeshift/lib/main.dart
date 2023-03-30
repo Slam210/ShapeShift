@@ -397,6 +397,33 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RoutinesPage()),
+                );
+              },
+              child: const Text('Go to Settings Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => WorkoutsPage()),
+                );
+              },
+              child: const Text('Go to Workouts Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+              },
+              child: const Text('Go to Settings Page'),
+            ),
+            ElevatedButton(
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
@@ -406,14 +433,33 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text('Log Out'),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings Page (under construction)'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('This will be cool in a few weeks.'),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const OtherPage()),
-                );
+                Navigator.pop(context);
               },
-              child: const Text('Go to Other Page'),
+              child: const Text('Back to Home Page'),
             ),
           ],
         ),
@@ -422,14 +468,42 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class OtherPage extends StatelessWidget {
-  const OtherPage({Key? key}) : super(key: key);
+class RoutinesPage extends StatelessWidget {
+  const RoutinesPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Other Page (under construction)'),
+        title: const Text('Routines Page (under construction)'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('This will be cool in a few weeks.'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Back to Home Page'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class WorkoutsPage extends StatelessWidget {
+  const WorkoutsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Workouts Page (under construction)'),
       ),
       body: Center(
         child: Column(
