@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         visualDensity: VisualDensity.standard,
-        primaryColorBrightness: Brightness.dark,
+        //primaryColorBrightness: Brightness.dark,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.resolveWith<Color?>(
@@ -45,17 +45,15 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.red,
         primaryColorLight: Colors.red,
         primaryColorDark: Colors.red,
-        accentColor: Colors.redAccent,
+        //accentColor: Colors.redAccent,
         shadowColor: Colors.red,
-        bottomAppBarColor: Colors.red,
+        //bottomAppBarColor: Colors.red,
         cardColor: Colors.red,
         hoverColor: Colors.red,
         highlightColor: Colors.red,
         dialogBackgroundColor: Colors.red,
         indicatorColor: Colors.red,
-        errorColor: Colors.red,
-        toggleableActiveColor: Colors.red,
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           displayLarge: TextStyle(
             color: Colors.red,
           ),
@@ -77,6 +75,52 @@ class MyApp extends StatelessWidget {
           bodySmall: TextStyle(
             color: Colors.grey,
           ),
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+            if (states.contains(MaterialState.disabled)) {
+              return null;
+            }
+            if (states.contains(MaterialState.selected)) {
+              return Colors.red;
+            }
+            return null;
+          }),
+          trackColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+            if (states.contains(MaterialState.disabled)) {
+              return null;
+            }
+            if (states.contains(MaterialState.selected)) {
+              return Colors.red;
+            }
+            return null;
+          }),
+        ),
+        radioTheme: RadioThemeData(
+          fillColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+            if (states.contains(MaterialState.disabled)) {
+              return null;
+            }
+            if (states.contains(MaterialState.selected)) {
+              return Colors.red;
+            }
+            return null;
+          }),
+        ),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+            if (states.contains(MaterialState.disabled)) {
+              return null;
+            }
+            if (states.contains(MaterialState.selected)) {
+              return Colors.red;
+            }
+            return null;
+          }),
         ),
       ),
       home: const StartPage(),
@@ -366,7 +410,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => OtherPage()),
+                  MaterialPageRoute(builder: (context) => const OtherPage()),
                 );
               },
               child: const Text('Go to Other Page'),
