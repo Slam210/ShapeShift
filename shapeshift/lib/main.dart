@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -131,10 +130,6 @@ class MyApp extends StatelessWidget {
 class StartPage extends StatelessWidget {
   const StartPage({Key? key}) : super(key: key);
 
-  Future<void> _checkLocationPermission(BuildContext context) async {
-    _navigateToLogin(context);
-  }
-
   void _navigateToLogin(BuildContext context) {
     Navigator.push(
       context,
@@ -149,24 +144,31 @@ class StartPage extends StatelessWidget {
     );
   }
 
+  void _navigateToResetPassword(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ResetPasswordPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Start Page'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => _checkLocationPermission(context),
-              child: const Text('Log In'),
+              onPressed: () => _navigateToLogin(context),
+              child: const Text('Login'),
             ),
-            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _navigateToSignup(context),
-              child: const Text('Sign Up'),
+              child: const Text('Sign up'),
+            ),
+            ElevatedButton(
+              onPressed: () => _navigateToResetPassword(context),
+              child: const Text('Reset Password'),
             ),
           ],
         ),
@@ -355,6 +357,86 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
+class ResetPasswordPage extends StatelessWidget {
+  const ResetPasswordPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController emailController = TextEditingController();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reset Password'),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Enter your email address to reset your password',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () async {
+                  String email = emailController.text;
+                  try {
+                    if (email.isEmpty) {
+                      // show error message
+                      return;
+                    }
+                    if (kDebugMode) {
+                      print(
+                          'Checking if $email is registered with Firebase...');
+                    } // Debugging statement
+                    List<String> signInMethods = await FirebaseAuth.instance
+                        .fetchSignInMethodsForEmail(email);
+                    if (signInMethods.isEmpty) {
+                      if (kDebugMode) {
+                        print('$email is not registered with Firebase.');
+                      } // Debugging statement
+                      // show error message
+                      return;
+                    }
+                    if (kDebugMode) {
+                      print('$email is registered with Firebase.');
+                    } // Debugging statement
+                    if (kDebugMode) {
+                      print('Sending password reset email to $email...');
+                    } // Debugging statement
+                    await FirebaseAuth.instance
+                        .sendPasswordResetEmail(email: email);
+                    if (kDebugMode) {
+                      print('Password reset email sent successfully.');
+                    } // Debugging statement
+                    // show success message
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print('Error sending password reset email: $e');
+                    } // Debugging statement
+                    // show error message
+                  }
+                },
+                child: const Text('Reset Password'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.email}) : super(key: key);
 
@@ -400,7 +482,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RoutinesPage()),
+                  MaterialPageRoute(builder: (context) => const RoutinesPage()),
                 );
               },
               child: const Text('Go to Settings Page'),
@@ -409,7 +491,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => WorkoutsPage()),
+                  MaterialPageRoute(builder: (context) => const WorkoutsPage()),
                 );
               },
               child: const Text('Go to Workouts Page'),
@@ -418,7 +500,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
               child: const Text('Go to Settings Page'),
