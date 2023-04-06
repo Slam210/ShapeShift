@@ -456,10 +456,14 @@ class SettingsPage extends StatelessWidget {
             const Text('This will be cool in a few weeks.'),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
+                );
               },
-              child: const Text('Back to Home Page'),
+              child: const Text('Log Out'),
             ),
           ],
         ),
