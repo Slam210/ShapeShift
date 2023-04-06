@@ -1,1 +1,4 @@
 shapeshift/.gitignore
+shapeshift/.flutter-plugins-dependencies
+shapeshift/.dart_tool/package_config.json
+.gitignore
