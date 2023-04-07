@@ -363,6 +363,8 @@ class ResetPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    String errorMessage = '';
 
     return Scaffold(
       appBar: AppBar(
@@ -371,65 +373,91 @@ class ResetPasswordPage extends StatelessWidget {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Enter your email address to reset your password',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Enter your email address to reset your password',
+                  textAlign: TextAlign.center,
                 ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  String email = emailController.text;
-                  try {
-                    if (email.isEmpty) {
-                      // show error message
-                      return;
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Email is required';
+                    } else if (!value.contains('@')) {
+                      return 'Invalid email address';
                     }
-                    if (kDebugMode) {
-                      print(
-                          'Checking if $email is registered with Firebase...');
-                    } // Debugging statement
-                    List<String> signInMethods = await FirebaseAuth.instance
-                        .fetchSignInMethodsForEmail(email);
-                    if (signInMethods.isEmpty) {
-                      if (kDebugMode) {
-                        print('$email is not registered with Firebase.');
-                      } // Debugging statement
-                      // show error message
-                      return;
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      String email = emailController.text;
+                      try {
+                        if (kDebugMode) {
+                          print(
+                              'Checking if $email is registered with Firebase...');
+                        } // Debugging statement
+                        List<String> signInMethods = await FirebaseAuth.instance
+                            .fetchSignInMethodsForEmail(email);
+                        if (signInMethods.isEmpty) {
+                          if (kDebugMode) {
+                            print('$email is not registered with Firebase.');
+                          } // Debugging statement
+                          errorMessage =
+                              'This email is not registered with Firebase.';
+                          emailController.clear();
+                        } else {
+                          if (kDebugMode) {
+                            print('$email is registered with Firebase.');
+                          } // Debugging statement
+                          if (kDebugMode) {
+                            print('Sending password reset email to $email...');
+                          } // Debugging statement
+                          await FirebaseAuth.instance
+                              .sendPasswordResetEmail(email: email);
+                          if (kDebugMode) {
+                            print('Password reset email sent successfully.');
+                          } // Debugging statement
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Password reset email sent successfully.'),
+                            ),
+                          );
+                          emailController.clear();
+                        }
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print('Error sending password reset email: $e');
+                        } // Debugging statement
+                        errorMessage = 'Error sending password reset email.';
+                        emailController.clear();
+                      }
                     }
-                    if (kDebugMode) {
-                      print('$email is registered with Firebase.');
-                    } // Debugging statement
-                    if (kDebugMode) {
-                      print('Sending password reset email to $email...');
-                    } // Debugging statement
-                    await FirebaseAuth.instance
-                        .sendPasswordResetEmail(email: email);
-                    if (kDebugMode) {
-                      print('Password reset email sent successfully.');
-                    } // Debugging statement
-                    // show success message
-                  } catch (e) {
-                    if (kDebugMode) {
-                      print('Error sending password reset email: $e');
-                    } // Debugging statement
-                    // show error message
-                  }
-                },
-                child: const Text('Reset Password'),
-              ),
-            ],
+                  },
+                  child: const Text('Reset Password'),
+                ),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -529,26 +557,86 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings Page (under construction)'),
+        title: const Text('Settings Page'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('This will be cool in a few weeks.'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
-                );
-              },
-              child: const Text('Log Out'),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'User Profile',
+              style: Theme.of(context).textTheme.headline6,
             ),
-          ],
-        ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Email'),
+            subtitle: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
+          ),
+          ListTile(
+            title: const Text('Username'),
+            subtitle: const Text('John Doe'), // Replace with user's username
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Change Password',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Current Password'),
+            subtitle: const TextField(),
+          ),
+          ListTile(
+            title: const Text('New Password'),
+            subtitle: const TextField(),
+          ),
+          ListTile(
+            title: const Text('Confirm New Password'),
+            subtitle: const TextField(),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Data Management',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Clear Data'),
+            subtitle: const Text('Delete all workout routines'),
+            trailing: const Icon(Icons.delete),
+            onTap: () {
+              // I should put something here
+            },
+          ),
+          ListTile(
+            title: const Text('Delete All Routines and Quit All Groups'),
+            subtitle: const Text('Delete all routines and leave all groups'),
+            trailing: const Icon(Icons.delete_forever),
+            onTap: () {
+              // we should implement delete all routines and quit all groups functionality
+            },
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const SignInPage()),
+              );
+            },
+            child: const Text('Log Out'),
+          ),
+        ],
       ),
     );
   }
