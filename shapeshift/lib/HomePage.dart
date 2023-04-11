@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'CalanderPage.dart';
 import 'GroupsPage.dart';
 import 'SettingsPage.dart';
 import 'SignInPage.dart';
@@ -68,6 +69,15 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               child: const Text('Go to Workouts Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CalendarPage()),
+                );
+              },
+              child: const Text('Go to Calendar Page'),
             ),
             ElevatedButton(
               onPressed: () {
