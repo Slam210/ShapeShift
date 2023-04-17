@@ -6,7 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'SignInPage.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  String userId;
+  SettingsPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +32,9 @@ class SettingsPage extends StatelessWidget {
               title: const Text('Email'),
               subtitle: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
             ),
-            const ListTile(
+            ListTile(
               title: Text('Username'),
-              subtitle: Text('John Doe'), // Replace with user's username
+              subtitle: Text(userId),
             ),
             const SizedBox(height: 20),
             Padding(
