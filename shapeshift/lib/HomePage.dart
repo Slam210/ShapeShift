@@ -1,13 +1,11 @@
 // ignore_for_file: file_names, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'CalanderPage.dart';
 import 'GroupsPage.dart';
 import 'SettingsPage.dart';
-import 'SignInPage.dart';
 import 'WorkoutPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -65,7 +63,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const WorkoutsPage()),
+                  MaterialPageRoute(
+                      builder: (context) => WorkoutsPage(userId: _username)),
                 );
               },
               child: const Text('Go to Workouts Page'),
@@ -87,16 +86,6 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               child: const Text('Go to Settings Page'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
-                );
-              },
-              child: const Text('Log Out'),
             ),
           ],
         ),
