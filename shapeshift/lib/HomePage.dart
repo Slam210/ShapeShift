@@ -82,7 +82,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  MaterialPageRoute(
+                      builder: (context) => SettingsPage(userId: _username)),
                 );
               },
               child: const Text('Go to Settings Page'),
