@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, use_build_context_synchronously
+// ignore_for_file: file_names, use_build_context_synchronously, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,7 +33,7 @@ class SettingsPage extends StatelessWidget {
               subtitle: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
             ),
             ListTile(
-              title: Text('Username'),
+              title: const Text('Username'),
               subtitle: Text(userId),
             ),
             const SizedBox(height: 20),
