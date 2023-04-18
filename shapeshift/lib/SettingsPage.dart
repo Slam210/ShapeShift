@@ -1,9 +1,10 @@
-// ignore_for_file: file_names, use_build_context_synchronously, must_be_immutable
+// ignore_for_file: use_build_context_synchronously, must_be_immutable, file_names
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shapeshift/StartPage.dart';
 
-import 'SignInPage.dart';
+import 'ResetPasswordPage.dart';
 
 class SettingsPage extends StatelessWidget {
   String userId;
@@ -45,17 +46,32 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             const Divider(),
-            const ListTile(
-              title: Text('Current Password'),
-              subtitle: TextField(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ResetPasswordPage()),
+                  );
+                },
+                child: const Text(
+                  'Reset Password',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
             ),
-            const ListTile(
-              title: Text('New Password'),
-              subtitle: TextField(),
-            ),
-            const ListTile(
-              title: Text('Confirm New Password'),
-              subtitle: TextField(),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Reset login password',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             const SizedBox(height: 20),
             Padding(
@@ -88,7 +104,7 @@ class SettingsPage extends StatelessWidget {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
+                  MaterialPageRoute(builder: (context) => const StartPage()),
                 );
               },
               child: const Text('Log Out'),

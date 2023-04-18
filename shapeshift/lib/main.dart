@@ -122,16 +122,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => Scaffold(
-              body: Center(
-                child: ElevatedButton(
-                  child: const Text('Start'),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/start');
-                  },
-                ),
-              ),
-            ),
+        '/': (context) => const StartPage(),
         '/start': (context) => const StartPage(),
       },
     );

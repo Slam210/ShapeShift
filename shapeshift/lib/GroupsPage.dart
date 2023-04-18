@@ -1,11 +1,11 @@
-// ignore_for_file: library_private_types_in_public_api, file_names
+// ignore_for_file: library_private_types_in_public_api, file_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'EditGroupPage.dart';
 import 'GroupClass.dart';
-import 'JoinGroup.dart';
+import 'GroupsJoinCreatePage.dart';
 
 class GroupsPage extends StatefulWidget {
   final String username;
@@ -69,16 +69,43 @@ class _GroupsPageState extends State<GroupsPage> {
               shrinkWrap: true,
               itemCount: _createdGroups.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_createdGroups[index].name),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              EditGroupPage(group: _createdGroups[index])),
-                    ).then((value) => _getGroups());
+                return Dismissible(
+                  key: Key(_createdGroups[index].id),
+                  onDismissed: (direction) async {
+                    final group = _createdGroups[index];
+                    await FirebaseFirestore.instance
+                        .collection('Group')
+                        .doc(group.id)
+                        .delete();
+                    setState(() {
+                      _createdGroups.removeAt(index);
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Group '${group.name}' deleted"),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   },
+                  background: Container(
+                    alignment: Alignment.centerLeft,
+                    color: Colors.red,
+                    child: const Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
+                  child: ListTile(
+                    title: Text(_createdGroups[index].name),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                EditGroupPage(group: _createdGroups[index])),
+                      ).then((value) => _getGroups());
+                    },
+                  ),
                 );
               },
             ),
@@ -89,12 +116,18 @@ class _GroupsPageState extends State<GroupsPage> {
             ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: _joinedGroups.length,
+              itemCount: _joinedGroups
+                  .where((group) => group.creator != widget.username)
+                  .length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_joinedGroups[index].name),
-                  onTap: () {
-                    showDialog(
+                final group = _joinedGroups
+                    .where((group) => group.creator != widget.username)
+                    .toList()[index];
+                return Dismissible(
+                  key: Key(group.id),
+                  direction: DismissDirection.startToEnd,
+                  confirmDismiss: (direction) async {
+                    return await showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
@@ -105,20 +138,35 @@ class _GroupsPageState extends State<GroupsPage> {
                             TextButton(
                               child: const Text("Cancel"),
                               onPressed: () {
-                                Navigator.of(context).pop();
+                                Navigator.of(context).pop(false);
                               },
                             ),
                             TextButton(
                               child: const Text("Leave"),
-                              onPressed: () {
+                              onPressed: () async {
                                 FirebaseFirestore.instance
                                     .collection('Group')
-                                    .doc(_joinedGroups[index].id)
+                                    .doc(group.id)
                                     .update({
                                   'members':
                                       FieldValue.arrayRemove([widget.username])
                                 });
-                                Navigator.of(context).pop();
+
+                                // Check if the user leaving the group is the creator
+                                final groupDocSnapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection('Group')
+                                    .doc(group.id)
+                                    .get();
+                                final creator = groupDocSnapshot['creator'];
+                                if (creator == widget.username) {
+                                  await FirebaseFirestore.instance
+                                      .collection('Group')
+                                      .doc(group.id)
+                                      .delete();
+                                }
+
+                                Navigator.of(context).pop(true);
                                 _getGroups();
                               },
                             ),
@@ -127,6 +175,25 @@ class _GroupsPageState extends State<GroupsPage> {
                       },
                     );
                   },
+                  background: Container(
+                    color: Colors.red,
+                    child: const Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  child: ListTile(
+                    title: Text(group.name),
+                    onTap: () {
+                      // Handle onTap
+                    },
+                  ),
                 );
               },
             ),
@@ -138,7 +205,8 @@ class _GroupsPageState extends State<GroupsPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => JoinGroupPage(user: widget.username)),
+                builder: (context) =>
+                    GroupsJoinCreatePage(username: widget.username)),
           ).then((value) => _getGroups());
         },
         child: const Icon(Icons.add),
