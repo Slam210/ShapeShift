@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:shapeshift/CalanderPage.dart';
+import 'package:shapeshift/Others/CalanderPage.dart';
 import 'package:shapeshift/Groups/GroupsPage.dart';
-import 'package:shapeshift/SettingsPage.dart';
+import 'package:shapeshift/Others/SettingsPage.dart';
 import 'package:shapeshift/Workouts/WorkoutPage.dart';
 
 class HomePage extends StatefulWidget {
