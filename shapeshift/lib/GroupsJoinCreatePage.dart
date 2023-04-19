@@ -1,10 +1,8 @@
-// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api, file_names
+// ignore_for_file: file_names, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'EditGroupPage.dart';
-import 'GroupClass.dart';
 import 'GroupsPage.dart';
 
 class GroupsJoinCreatePage extends StatefulWidget {
@@ -122,24 +120,26 @@ class _GroupsJoinCreatePageState extends State<GroupsJoinCreatePage> {
                           .doc()
                           .id;
                       final groupName = _groupNameController.text.trim();
-                      final group = Group(
-                        id: groupId,
-                        name: groupName,
-                        members: [widget.username],
-                        creator: widget.username,
-                      );
                       await FirebaseFirestore.instance
                           .collection('Group')
                           .doc(groupId)
                           .set({
                         'name': groupName,
                         'members': [widget.username],
-                        'creator': widget.username
+                        'creator': widget.username,
                       });
+                      // Add an empty workouts collection to the newly created group document
+                      await FirebaseFirestore.instance
+                          .collection('Group')
+                          .doc(groupId)
+                          .collection('workouts')
+                          .doc()
+                          .set({});
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditGroupPage(group: group),
+                          builder: (context) =>
+                              GroupsPage(username: widget.username),
                         ),
                       );
                     },

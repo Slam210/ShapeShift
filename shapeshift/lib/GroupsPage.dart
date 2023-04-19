@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, file_names, use_build_context_synchronously
+// ignore_for_file: file_names, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,24 +29,21 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Future<void> _getGroups() async {
-    final joinedGroupsSnapshot = await FirebaseFirestore.instance
-        .collection('Group')
-        .where('members', arrayContains: widget.username)
-        .get();
-    final createdGroupsSnapshot = await FirebaseFirestore.instance
-        .collection('Group')
-        .where('creator', isEqualTo: widget.username)
-        .get();
+    final groupsSnapshot =
+        await FirebaseFirestore.instance.collection('Group').get();
+
+    final joinedGroups = groupsSnapshot.docs
+        .where((doc) => doc['members'].contains(widget.username))
+        .map((doc) => Group.fromDocument(doc))
+        .toList();
+    final createdGroups = groupsSnapshot.docs
+        .where((doc) => doc['creator'] == widget.username)
+        .map((doc) => Group.fromDocument(doc))
+        .toList();
 
     setState(() {
-      _joinedGroups = joinedGroupsSnapshot.docs
-          .map((doc) => Group.fromDocument(doc))
-          .toList()
-          .cast<Group>();
-      _createdGroups = createdGroupsSnapshot.docs
-          .map((doc) => Group.fromDocument(doc))
-          .toList()
-          .cast<Group>();
+      _joinedGroups = joinedGroups;
+      _createdGroups = createdGroups;
     });
   }
 
@@ -101,8 +98,11 @@ class _GroupsPageState extends State<GroupsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                EditGroupPage(group: _createdGroups[index])),
+                          builder: (context) => EditGroupPage(
+                            group: _createdGroups[index],
+                            username: widget.username,
+                          ),
+                        ),
                       ).then((value) => _getGroups());
                     },
                   ),
@@ -120,9 +120,10 @@ class _GroupsPageState extends State<GroupsPage> {
                   .where((group) => group.creator != widget.username)
                   .length,
               itemBuilder: (context, index) {
-                final group = _joinedGroups
+                final joinedGroupsList = _joinedGroups
                     .where((group) => group.creator != widget.username)
-                    .toList()[index];
+                    .toList();
+                final group = joinedGroupsList[index];
                 return Dismissible(
                   key: Key(group.id),
                   direction: DismissDirection.startToEnd,
@@ -167,7 +168,7 @@ class _GroupsPageState extends State<GroupsPage> {
                                 }
 
                                 Navigator.of(context).pop(true);
-                                _getGroups();
+                                await _getGroups();
                               },
                             ),
                           ],

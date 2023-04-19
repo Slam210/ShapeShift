@@ -3,9 +3,9 @@
   "packages": [
     {
       "name": "_flutterfire_internals",
-      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.0.18",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.1.1",
       "packageUri": "lib/",
-      "languageVersion": "2.16"
+      "languageVersion": "2.18"
     },
     {
       "name": "async",
@@ -56,6 +56,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "crypto",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/crypto-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
       "name": "cupertino_icons",
       "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.5",
       "packageUri": "lib/",
@@ -87,21 +93,39 @@
     },
     {
       "name": "firebase_core",
-      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_core-2.8.0",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_core-2.10.0",
       "packageUri": "lib/",
-      "languageVersion": "2.16"
+      "languageVersion": "2.18"
     },
     {
       "name": "firebase_core_platform_interface",
-      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_core_platform_interface-4.5.3",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_core_platform_interface-4.6.0",
       "packageUri": "lib/",
-      "languageVersion": "2.16"
+      "languageVersion": "2.18"
     },
     {
       "name": "firebase_core_web",
-      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_core_web-2.2.2",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_core_web-2.3.0",
       "packageUri": "lib/",
-      "languageVersion": "2.16"
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "firebase_database",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_database-10.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "firebase_database_platform_interface",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_database_platform_interface-0.2.3+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "firebase_database_web",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/firebase_database_web-0.2.2+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
     },
     {
       "name": "flutter",
@@ -230,6 +254,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "uuid",
+      "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/uuid-3.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "vector_math",
       "rootUri": "file:///Users/steven/.pub-cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
@@ -242,7 +272,7 @@
       "languageVersion": "2.19"
     }
   ],
-  "generated": "2023-04-17T21:25:53.374909Z",
+  "generated": "2023-04-19T04:35:12.487595Z",
   "generator": "pub",
   "generatorVersion": "2.19.4"
 }

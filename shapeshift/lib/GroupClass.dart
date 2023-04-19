@@ -23,4 +23,27 @@ class Group {
       creator: snapshot['creator'],
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'members': members,
+      'creator': creator,
+    };
+  }
+
+  Group copyWith({
+    String? id,
+    String? name,
+    List<String>? members,
+    String? creator,
+  }) {
+    return Group(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      members: members ?? this.members,
+      creator: creator ?? this.creator,
+    );
+  }
 }
