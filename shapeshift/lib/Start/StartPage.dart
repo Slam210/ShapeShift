@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'ResetPasswordPage.dart';
+import 'package:shapeshift/Start/ResetPasswordPage.dart';
 import 'SignInPage.dart';
 import 'SignUpPage.dart';
 

@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'CalanderPage.dart';
-import 'GroupsPage.dart';
-import 'SettingsPage.dart';
-import 'WorkoutPage.dart';
+import 'package:shapeshift/CalanderPage.dart';
+import 'package:shapeshift/Groups/GroupsPage.dart';
+import 'package:shapeshift/SettingsPage.dart';
+import 'package:shapeshift/Workouts/WorkoutPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.email}) : super(key: key);

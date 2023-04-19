@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shapeshift/StartPage.dart';
+import 'package:shapeshift/Start/StartPage.dart';
 
-import 'ResetPasswordPage.dart';
+import 'package:shapeshift/Start/ResetPasswordPage.dart';
 
 class SettingsPage extends StatelessWidget {
   String userId;
