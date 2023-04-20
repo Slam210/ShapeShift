@@ -152,6 +152,159 @@ class _EditGroupPageState extends State<EditGroupPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
+          Flexible(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Group')
+                  .doc(_group.id)
+                  .collection('workouts')
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                if (!snapshot.hasData) {
+                  return const Text('Loading...');
+                }
+
+                final documents = snapshot.data!.docs;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: documents.length,
+                        itemBuilder: (context, index) {
+                          final workout = documents[index];
+                          return FutureBuilder<DocumentSnapshot>(
+                            future: workout.reference.get(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<DocumentSnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                return const Text('Error loading workout');
+                              }
+
+                              if (!snapshot.hasData) {
+                                return const Text('Loading workout...');
+                              }
+
+                              final data =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              final title = data['title'];
+                              final description = data['description'];
+
+                              return ListTile(
+                                title: Text(title),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(title),
+                                        content: Text(description),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Get a list of workouts from Firebase
+              List<Map<String, dynamic>> workouts = [];
+              try {
+                final snapshot = await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(widget.username)
+                    .collection('workouts')
+                    .get();
+                if (snapshot.docs.isNotEmpty) {
+                  workouts = snapshot.docs.map((doc) => doc.data()).toList();
+                }
+              } catch (e) {
+                if (kDebugMode) {
+                  print("Error getting workouts from Firebase: $e");
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("An error occurred while getting workouts"),
+                  ),
+                );
+                return;
+              }
+
+              // Show a dialog with a list of workouts
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("Select a workout"),
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: workouts.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final workout = workouts[index];
+                          return ListTile(
+                            title: Text(workout['title']),
+                            onTap: () {
+                              Navigator.of(context).pop(workout);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ).then((selectedWorkoutData) async {
+                if (selectedWorkoutData != null) {
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('Group')
+                        .doc(_group.id)
+                        .collection('workouts')
+                        .add(selectedWorkoutData);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Workout added")),
+                    );
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print("Error adding workout: $e");
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text("An error occurred while adding the workout"),
+                      ),
+                    );
+                  }
+                }
+              });
+            },
+            child: const Text("Add Workout"),
+          )
         ],
       ),
     );

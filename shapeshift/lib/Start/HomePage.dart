@@ -54,30 +54,30 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
+                  MaterialPageRoute(builder: (context) => const CalendarPage()),
+                );
+              },
+              child: const Text('Go to Calendar Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MapPage(userId: _username)),
+                );
+              },
+              child: const Text('Go to Map Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
                   MaterialPageRoute(
                       builder: (context) => GroupsPage(username: _username)),
                 );
               },
               child: const Text('Go to Groups Page'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => WorkoutsPage(userId: _username)),
-                );
-              },
-              child: const Text('Go to Workouts Page'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CalendarPage()),
-                );
-              },
-              child: const Text('Go to Calendar Page'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -94,10 +94,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MapPage(userId: _username)),
+                      builder: (context) => WorkoutsPage(userId: _username)),
                 );
               },
-              child: const Text('Go to Map Page'),
+              child: const Text('Go to Workouts Page'),
             ),
           ],
         ),
