@@ -170,6 +170,11 @@ class _EditGroupPageState extends State<EditGroupPage> {
                 }
 
                 final documents = snapshot.data!.docs;
+
+                if (documents.isEmpty) {
+                  return const Text('There are no workouts.');
+                }
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -197,28 +202,63 @@ class _EditGroupPageState extends State<EditGroupPage> {
                               final title = data['title'];
                               final description = data['description'];
 
-                              return ListTile(
-                                title: Text(title),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text(title),
-                                        content: Text(description),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Close'),
-                                          ),
-                                        ],
+                              if (title != null && title.isNotEmpty) {
+                                return Dismissible(
+                                  key: ValueKey(workout.id),
+                                  onDismissed: (direction) async {
+                                    try {
+                                      // Delete the document from Firestore
+                                      await workout.reference.delete();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text('$title deleted.'),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'An error occurred while deleting $title.'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  background: Container(
+                                    color: Colors.red,
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: const Icon(Icons.delete,
+                                        color: Colors.white),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(title),
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text(title),
+                                            content: Text(description),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('Close'),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       );
                                     },
-                                  );
-                                },
-                              );
+                                  ),
+                                );
+                              } else {
+                                return Container();
+                              }
                             },
                           );
                         },
