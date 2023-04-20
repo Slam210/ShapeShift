@@ -7,6 +7,7 @@ import 'package:shapeshift/Others/CalanderPage.dart';
 import 'package:shapeshift/Groups/GroupsPage.dart';
 import 'package:shapeshift/Others/SettingsPage.dart';
 import 'package:shapeshift/Workouts/WorkoutPage.dart';
+import 'package:shapeshift/Others/MapPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.email}) : super(key: key);
@@ -87,6 +88,16 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               child: const Text('Go to Settings Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MapPage(userId: _username)),
+                );
+              },
+              child: const Text('Go to Map Page'),
             ),
           ],
         ),

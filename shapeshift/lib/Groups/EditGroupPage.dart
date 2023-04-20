@@ -88,58 +88,68 @@ class _EditGroupPageState extends State<EditGroupPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          Expanded(
+          Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.35,
-                  ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _group.members.length,
-                    itemBuilder: (context, index) {
-                      final member = _group.members[index];
-                      return ListTile(
-                        title: Text(member),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () async {
-                            try {
-                              await FirebaseFirestore.instance
-                                  .collection('Group')
-                                  .doc(_group.id)
-                                  .update({
-                                'members': FieldValue.arrayRemove([member])
-                              });
-                              setState(() {
-                                _group = _group.copyWith(
-                                    members: _group.members..remove(member));
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("User removed from group")),
-                              );
-                            } catch (e) {
-                              if (kDebugMode) {
-                                print("Error removing user from group: $e");
+                SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.3,
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _group.members.length,
+                      itemBuilder: (context, index) {
+                        final member = _group.members[index];
+                        return ListTile(
+                          title: Text(member),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              try {
+                                await FirebaseFirestore.instance
+                                    .collection('Group')
+                                    .doc(_group.id)
+                                    .update({
+                                  'members': FieldValue.arrayRemove([member])
+                                });
+                                setState(() {
+                                  _group = _group.copyWith(
+                                      members: _group.members..remove(member));
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("User removed from group")),
+                                );
+                              } catch (e) {
+                                if (kDebugMode) {
+                                  print("Error removing user from group: $e");
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "An error occurred while removing the user"),
+                                  ),
+                                );
                               }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      "An error occurred while removing the user"),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      );
-                    },
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
+                )
               ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              "Workouts",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
         ],
