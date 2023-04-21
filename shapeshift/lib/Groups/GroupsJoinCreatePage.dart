@@ -129,12 +129,10 @@ class _GroupsJoinCreatePageState extends State<GroupsJoinCreatePage> {
                         'creator': widget.username,
                       });
                       // Add an empty workouts collection to the newly created group document
-                      await FirebaseFirestore.instance
+                      FirebaseFirestore.instance
                           .collection('Group')
                           .doc(groupId)
-                          .collection('workouts')
-                          .doc()
-                          .set({});
+                          .collection('workouts');
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
