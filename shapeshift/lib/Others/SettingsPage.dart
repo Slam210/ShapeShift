@@ -1,10 +1,11 @@
-// ignore_for_file: use_build_context_synchronously, must_be_immutable, file_names
+// ignore_for_file: file_names, use_build_context_synchronously, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shapeshift/Start/StartPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:shapeshift/Start/ResetPasswordPage.dart';
+import '../Start/ResetPasswordPage.dart';
+import '../Start/SignInPage.dart';
 
 class SettingsPage extends StatelessWidget {
   String userId;
@@ -73,6 +74,7 @@ class SettingsPage extends StatelessWidget {
                 style: TextStyle(color: Colors.grey),
               ),
             ),
+            const Divider(),
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -86,16 +88,48 @@ class SettingsPage extends StatelessWidget {
               title: const Text('Clear Data'),
               subtitle: const Text('Delete all workout routines'),
               trailing: const Icon(Icons.delete),
-              onTap: () {
-                // I should put something here
+              onTap: () async {
+                // Delete all workout routines for the user
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .collection('workouts')
+                    .get()
+                    .then((querySnapshot) {
+                  for (var doc in querySnapshot.docs) {
+                    doc.reference.delete();
+                  }
+                });
               },
             ),
             ListTile(
               title: const Text('Delete All Routines and Quit All Groups'),
               subtitle: const Text('Delete all routines and leave all groups'),
               trailing: const Icon(Icons.delete_forever),
-              onTap: () {
-                // we should implement delete all routines and quit all groups functionality
+              onTap: () async {
+                // Delete all workout routines for the user
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .collection('workouts')
+                    .get()
+                    .then((querySnapshot) {
+                  for (var doc in querySnapshot.docs) {
+                    doc.reference.delete();
+                  }
+                });
+
+                // Delete all groups for the user
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .collection('groups')
+                    .get()
+                    .then((querySnapshot) {
+                  for (var doc in querySnapshot.docs) {
+                    doc.reference.delete();
+                  }
+                });
               },
             ),
             const SizedBox(height: 20),
@@ -104,7 +138,7 @@ class SettingsPage extends StatelessWidget {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const StartPage()),
+                  MaterialPageRoute(builder: (context) => const SignInPage()),
                 );
               },
               child: const Text('Log Out'),
