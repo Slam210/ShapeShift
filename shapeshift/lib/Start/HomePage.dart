@@ -54,7 +54,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CalendarPage()),
+                  MaterialPageRoute(
+                      builder: (context) => CalendarPage(userId: _username)),
                 );
               },
               child: const Text('Go to Calendar Page'),
