@@ -19,9 +19,9 @@ class _CalendarPageState extends State<CalendarPage> {
     super.initState();
     _selectedEvents = ValueNotifier([]);
     _events = {
-      DateTime.utc(2022, 4, 28): [Event('Event 1')],
-      DateTime.utc(2022, 5, 3): [Event('Event 2')],
-      DateTime.utc(2022, 5, 5): [Event('Event 3')],
+      DateTime.utc(2023, 4, 26): [Event('Event 1')],
+      DateTime.utc(2023, 4, 27): [Event('Event 2')],
+      DateTime.utc(2023, 4, 26): [Event('Event 3')],
     };
   }
 
@@ -39,7 +39,9 @@ class _CalendarPageState extends State<CalendarPage> {
             focusedDay: DateTime.now(),
             eventLoader: (day) => _events[day] ?? [],
             onDaySelected: (selectedDay, focusedDay) {
-              _selectedEvents.value = _events[selectedDay] ?? [];
+              setState(() {
+                _selectedEvents.value = _events[selectedDay] ?? [];
+              });
             },
           ),
           const SizedBox(height: 8),
@@ -47,6 +49,11 @@ class _CalendarPageState extends State<CalendarPage> {
             child: ValueListenableBuilder<List<Event>>(
               valueListenable: _selectedEvents,
               builder: (context, events, _) {
+                if (events.isEmpty) {
+                  return const Center(
+                    child: Text('No events for selected day.'),
+                  );
+                }
                 return ListView.builder(
                   itemCount: events.length,
                   itemBuilder: (context, index) {
