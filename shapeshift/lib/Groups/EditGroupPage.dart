@@ -247,7 +247,12 @@ class _EditGroupPageState extends State<EditGroupPage> {
                                                 onPressed: () {
                                                   Navigator.pop(context);
                                                 },
-                                                child: const Text('Close'),
+                                                child: const Text(
+                                                  'Close',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           );

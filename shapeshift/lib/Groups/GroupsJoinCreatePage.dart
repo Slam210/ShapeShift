@@ -127,12 +127,22 @@ class _GroupsJoinCreatePageState extends State<GroupsJoinCreatePage> {
                         'name': groupName,
                         'members': [widget.username],
                         'creator': widget.username,
+                      }).then((_) {
+                        // Add an empty workouts collection to the newly created group document
+                        FirebaseFirestore.instance
+                            .collection('Group')
+                            .doc(groupId)
+                            .collection('workouts')
+                            .add({});
+
+                        // Add an empty locations collection to the newly created group document
+                        FirebaseFirestore.instance
+                            .collection('Group')
+                            .doc(groupId)
+                            .collection('locations')
+                            .add({});
                       });
-                      // Add an empty workouts collection to the newly created group document
-                      FirebaseFirestore.instance
-                          .collection('Group')
-                          .doc(groupId)
-                          .collection('workouts');
+
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

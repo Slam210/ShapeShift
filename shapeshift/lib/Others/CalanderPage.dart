@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, file_names
+
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -19,9 +21,9 @@ class _CalendarPageState extends State<CalendarPage> {
     super.initState();
     _selectedEvents = ValueNotifier([]);
     _events = {
-      DateTime.utc(2023, 4, 26): [Event('Event 1')],
-      DateTime.utc(2023, 4, 27): [Event('Event 2')],
-      DateTime.utc(2023, 4, 26): [Event('Event 3')],
+      DateTime.utc(2023, 4, 26): [const Event('Event 1')],
+      DateTime.utc(2023, 4, 27): [const Event('Event 2')],
+      DateTime.utc(2023, 4, 26): [const Event('Event 3')],
     };
   }
 
