@@ -222,8 +222,7 @@ class _MapPageState extends State<MapPage> {
                   title: Text(group.name),
                   onTap: () {
                     setState(() {
-                      _selectedGroupName = group
-                          .name; // store the group name in another variable
+                      _selectedGroupName = group.name;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
