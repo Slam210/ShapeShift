@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 import 'EditGroupPage.dart';
 import 'GroupClass.dart';
@@ -62,7 +63,6 @@ class _GroupsPageState extends State<GroupsPage> {
               child: Text("Groups You've Created:"),
             ),
             ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: _createdGroups.length,
               itemBuilder: (context, index) {
@@ -73,7 +73,32 @@ class _GroupsPageState extends State<GroupsPage> {
                     await FirebaseFirestore.instance
                         .collection('Group')
                         .doc(group.id)
-                        .delete();
+                        .delete()
+                        .then((_) async {
+                      // Delete the sub-collections
+                      await FirebaseFirestore.instance
+                          .collection('Group')
+                          .doc(group.id)
+                          .collection('workouts')
+                          .get()
+                          .then((querySnapshot) {
+                        for (var doc in querySnapshot.docs) {
+                          doc.reference.delete();
+                        }
+                      });
+
+                      await FirebaseFirestore.instance
+                          .collection('Group')
+                          .doc(group.id)
+                          .collection('locations')
+                          .get()
+                          .then((querySnapshot) {
+                        for (var doc in querySnapshot.docs) {
+                          doc.reference.delete();
+                        }
+                      });
+                    });
+
                     setState(() {
                       _createdGroups.removeAt(index);
                     });
@@ -105,6 +130,37 @@ class _GroupsPageState extends State<GroupsPage> {
                         ),
                       ).then((value) => _getGroups());
                     },
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Group ID'),
+                          content: Text(_createdGroups[index].id),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(
+                                  text: _createdGroups[index].id,
+                                ));
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                'Copy',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 );
               },
@@ -114,7 +170,6 @@ class _GroupsPageState extends State<GroupsPage> {
               child: Text("Groups You've Joined:"),
             ),
             ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: _joinedGroups
                   .where((group) => group.creator != widget.username)
@@ -169,6 +224,37 @@ class _GroupsPageState extends State<GroupsPage> {
 
                                 Navigator.of(context).pop(true);
                                 await _getGroups();
+                              },
+                              onLongPress: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Group ID'),
+                                    content: Text(_createdGroups[index].id),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Clipboard.setData(ClipboardData(
+                                            text: _createdGroups[index].id,
+                                          ));
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(
+                                          'Copy',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Close'),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
                             ),
                           ],
