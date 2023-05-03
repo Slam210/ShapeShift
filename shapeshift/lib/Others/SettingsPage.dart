@@ -35,6 +35,7 @@ class SettingsPage extends StatelessWidget {
               subtitle: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
             ),
             ListTile(
+              //CHANGE THIS TO BE EDITABLE SO YOU CAN EDIT YOUR USERNAME
               title: const Text('Username'),
               subtitle: Text(userId),
             ),
@@ -119,7 +120,7 @@ class SettingsPage extends StatelessWidget {
                   }
                 });
 
-                // Delete all groups for the user
+                // Delete all groups for the user MAKE THIS ACTUALLY WORK
                 await FirebaseFirestore.instance
                     .collection('users')
                     .doc(userId)
