@@ -21,9 +21,9 @@ class _MapPageState extends State<MapPage> {
   GoogleMapController? mapController;
   Set<Marker> markers = {};
   LatLng? currentLocation;
-  bool toggle = false; // Initial state of toggle is true
+  bool toggle = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int? clickedIndex; // Store the clicked index
+  int? clickedIndex;
   late CollectionReference<Map<String, dynamic>> groupsRef;
   late List<Group> _joinedGroups;
   late String _selectedGroupName = '';
@@ -148,45 +148,28 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey, // Set the key to access the ScaffoldState
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text("Map Page"),
       ),
       body: Column(
         children: [
           Expanded(
-            flex: 3,
-            child: currentLocation == null
-                ? GoogleMap(
-                    zoomGesturesEnabled: true,
-                    initialCameraPosition: const CameraPosition(
-                      target: LatLng(0, 0), // Set target to 0,0
-                      zoom: 10.0,
-                    ),
-                    markers: markers,
-                    mapType: MapType.normal,
-                    onMapCreated: (controller) {
-                      setState(() {
-                        mapController = controller;
-                      });
-                    },
-                  )
-                : GoogleMap(
-                    zoomGesturesEnabled: true,
-                    initialCameraPosition: CameraPosition(
-                      target: currentLocation!,
-                      zoom: 10.0,
-                    ),
-                    markers: markers,
-                    // Display markers only if toggle is true
-                    mapType: MapType.normal,
-                    onMapCreated: (controller) {
-                      setState(() {
-                        mapController = controller;
-                      });
-                    },
-                  ),
-          ),
+              flex: 3,
+              child: GoogleMap(
+                zoomGesturesEnabled: true,
+                initialCameraPosition: const CameraPosition(
+                  target: LatLng(0, 0),
+                  zoom: 10.0,
+                ),
+                markers: markers,
+                mapType: MapType.normal,
+                onMapCreated: (controller) {
+                  setState(() {
+                    mapController = controller;
+                  });
+                },
+              )),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
