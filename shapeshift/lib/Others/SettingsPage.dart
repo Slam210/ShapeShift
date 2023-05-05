@@ -7,9 +7,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Start/ResetPasswordPage.dart';
 import '../Start/SignInPage.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   String userId;
   SettingsPage({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  late TextEditingController _usernameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController = TextEditingController(text: widget.userId);
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +45,7 @@ class SettingsPage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'User Profile',
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(context).textTheme.headline6,
               ),
             ),
             const Divider(),
@@ -35,9 +54,34 @@ class SettingsPage extends StatelessWidget {
               subtitle: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
             ),
             ListTile(
-              //CHANGE THIS TO BE EDITABLE SO YOU CAN EDIT YOUR USERNAME
               title: const Text('Username'),
-              subtitle: Text(userId),
+              subtitle: TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter your username',
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                String newUsername = _usernameController.text.trim();
+                if (newUsername.isNotEmpty) {
+                  // Update username in our db
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(widget.userId)
+                      .update({'username': newUsername});
+
+                  // Update the username displayed in settings page
+                  setState(() {
+                    widget.userId = newUsername;
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Username updated successfully')));
+                }
+              },
+              child: const Text('Update Username'),
             ),
             const SizedBox(height: 20),
             Padding(
@@ -93,7 +137,7 @@ class SettingsPage extends StatelessWidget {
                 // Delete all workout routines for the user
                 await FirebaseFirestore.instance
                     .collection('users')
-                    .doc(userId)
+                    .doc(widget.userId)
                     .collection('workouts')
                     .get()
                     .then((querySnapshot) {
@@ -111,7 +155,7 @@ class SettingsPage extends StatelessWidget {
                 // Delete all workout routines for the user
                 await FirebaseFirestore.instance
                     .collection('users')
-                    .doc(userId)
+                    .doc(widget.userId)
                     .collection('workouts')
                     .get()
                     .then((querySnapshot) {
@@ -123,7 +167,7 @@ class SettingsPage extends StatelessWidget {
                 // Delete all groups for the user MAKE THIS ACTUALLY WORK
                 await FirebaseFirestore.instance
                     .collection('users')
-                    .doc(userId)
+                    .doc(widget.userId)
                     .collection('groups')
                     .get()
                     .then((querySnapshot) {
