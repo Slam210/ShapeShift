@@ -37,6 +37,10 @@ class StartPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Image(
+              image: NetworkImage(
+                  'https://i.ytimg.com/vi/cIkMfqXyxVg/maxresdefault.jpg'),
+            ),
             ElevatedButton(
               onPressed: () => _navigateToLogin(context),
               child: const Text('Login'),
