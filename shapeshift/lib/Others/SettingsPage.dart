@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, use_build_context_synchronously, must_be_immutable
+// ignore_for_file: file_names, use_build_context_synchronously, must_be_immutable, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'User Profile',
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             const Divider(),
