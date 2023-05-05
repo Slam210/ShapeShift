@@ -67,7 +67,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 String newUsername = _usernameController.text.trim();
                 if (newUsername.isNotEmpty) {
                   // Update username in our db
-                  await FirebaseFirestore.instance
+                  FirebaseFirestore.instance
                       .collection('users')
                       .where((doc) => doc['username'].contains(widget.userId));
 
