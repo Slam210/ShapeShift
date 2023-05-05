@@ -69,8 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   // Update username in our db
                   await FirebaseFirestore.instance
                       .collection('users')
-                      .doc(widget.userId)
-                      .update({'username': newUsername});
+                      .where((doc) => doc['username'].contains(widget.userId));
 
                   // Update the username displayed in settings page
                   setState(() {
@@ -78,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   });
 
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Username updated successfully')));
+                      content: Text('Cosmetic username updated successfully')));
                 }
               },
               child: const Text('Update Username'),
