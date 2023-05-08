@@ -67,6 +67,10 @@ class _CalendarPageState extends State<CalendarPage> {
               },
             ),
           ),
+          const Image(
+            image: NetworkImage(
+                'https://www.verywellfit.com/thmb/5BmWCs3muNUIJOz_kTsWnmF58sQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Dotdash-VWFit-reasons-to-hire-a-personal-trainer-1231372-v1-c822137213bb460ab973a5d651c31fe7.jpg'),
+          ),
         ],
       ),
     );

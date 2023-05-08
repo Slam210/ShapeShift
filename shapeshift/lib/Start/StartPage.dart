@@ -33,13 +33,16 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('WELCOME TO SHAPESHIT!'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Image(
               image: NetworkImage(
-                  'https://i.ytimg.com/vi/cIkMfqXyxVg/maxresdefault.jpg'),
+                  'https://www.shutterstock.com/shutterstock/photos/1730075293/display_1500/stock-photo-portrait-of-his-he-nice-funky-motivated-mad-foxy-guy-lifting-barbell-doing-work-out-trainer-program-1730075293.jpg'),
             ),
             ElevatedButton(
               onPressed: () => _navigateToLogin(context),
