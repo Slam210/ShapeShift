@@ -79,9 +79,19 @@ class _SignupPageState extends State<SignupPage> {
         User? user = userCredential.user;
         if (user != null) {
           user.updateDisplayName(_username);
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+            'username': _username,
+            'email': _email,
+            'password': _password
+          });
+          await FirebaseFirestore.instance
+              .collection('Calendar')
+              .doc(_username)
+              .set({});
         }
-        FirebaseFirestore.instance.collection('users').doc(user!.uid).set(
-            {'username': _username, 'email': _email, 'password': _password});
         Navigator.pop(context); // Return to homepage after signing up
       } catch (e) {
         if (kDebugMode) {

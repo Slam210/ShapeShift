@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
+// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,103 +11,161 @@ class WorkoutsPage extends StatelessWidget {
   final String userId;
   WorkoutsPage({Key? key, required this.userId}) : super(key: key);
 
-  Future<List<QueryDocumentSnapshot>> fetchWorkoutsFromGroups() async {
-    List<QueryDocumentSnapshot> workouts = [];
-
-    final groupsDocs = await firestore
-        .collection('Group')
-        .where((doc) => doc['members'].contains(userId))
-        .get();
-
-    // workouts from each group
-    for (final groupDoc in groupsDocs.docs) {
-      final workoutsCollection = groupDoc.reference.collection('workouts');
-      final workoutsDocs = await workoutsCollection.get();
-      workouts.addAll(workoutsDocs.docs);
-    }
-
-    return workouts;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Workouts Page'),
       ),
-      body: FutureBuilder<List<QueryDocumentSnapshot>>(
-        future: fetchWorkoutsFromGroups(),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: firestore
+            .collection('users')
+            .doc(userId)
+            .collection('workouts')
+            .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (!snapshot.hasData) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (snapshot.hasData) {
-            final List<QueryDocumentSnapshot> groupWorkouts = snapshot.data!;
-            return StreamBuilder<QuerySnapshot>(
-              stream: firestore
-                  .collection('users')
-                  .doc(userId)
-                  .collection('workouts')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  final List<DocumentSnapshot> userWorkouts =
-                      snapshot.data!.docs;
-                  return ListView.builder(
-                    itemCount: userWorkouts.length + groupWorkouts.length,
+          } else {
+            final List<DocumentSnapshot> documents = snapshot.data!.docs;
+            return Column(
+              children: [
+                const SizedBox(height: 16.0),
+                Text(
+                  'Created',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 16.0),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height *
+                      0.35, // Set the height to half the screen height
+                  child: ListView.builder(
+                    itemCount: documents.length,
                     itemBuilder: (context, index) {
-                      if (index < userWorkouts.length) {
-                        final DocumentSnapshot document = userWorkouts[index];
-                        return ListTile(
-                          title: Text(document['title']),
-                          subtitle: Text(document['description']),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              firestore
-                                  .collection('users')
-                                  .doc(userId)
-                                  .collection('workouts')
-                                  .doc(document.id)
-                                  .delete();
-                            },
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditWorkoutPage(
-                                  userId: userId,
-                                  workoutId: document.id,
-                                  title: document['title'],
-                                  description: document['description'],
-                                ),
+                      final DocumentSnapshot document = documents[index];
+                      return ListTile(
+                        title: Text(document['title']),
+                        subtitle: Text(document['description']),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            firestore
+                                .collection('users')
+                                .doc(userId)
+                                .collection('workouts')
+                                .doc(document.id)
+                                .delete();
+                          },
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditWorkoutPage(
+                                userId: userId,
+                                workoutId: document.id,
+                                title: document['title'],
+                                description: document['description'],
                               ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  'Groups',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 16.0),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Group')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      final List<DocumentSnapshot> groupDocuments =
+                          snapshot.data!.docs;
+                      final List<DocumentSnapshot> joinedGroupDocuments =
+                          groupDocuments
+                              .where((doc) => (doc['members'] as List<dynamic>)
+                                  .contains(userId))
+                              .toList();
+
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height *
+                            0.35, // Set the height to half the screen height
+                        child: ListView.builder(
+                          itemCount: joinedGroupDocuments.length,
+                          itemBuilder: (context, index) {
+                            final DocumentSnapshot groupDoc =
+                                joinedGroupDocuments[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 16.0),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.35,
+                                  child: StreamBuilder<QuerySnapshot>(
+                                    stream: groupDoc.reference
+                                        .collection('workouts')
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      } else {
+                                        final List<DocumentSnapshot>
+                                            workoutDocs = snapshot.data!.docs;
+                                        var testing = workoutDocs.length;
+                                        debugPrint(
+                                            'I im logging here $testing');
+                                        return ListView.builder(
+                                          itemCount: testing - 1,
+                                          itemBuilder: (context, index) {
+                                            final DocumentSnapshot workoutDoc =
+                                                workoutDocs[index];
+                                            return ListTile(
+                                              title: Text(workoutDoc['title']),
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                          workoutDoc['title']),
+                                                      content: Text(workoutDoc[
+                                                          'description']),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
                             );
                           },
-                        );
-                      } else {
-                        // group stuff
-                        final QueryDocumentSnapshot document =
-                            groupWorkouts[index - userWorkouts.length];
-                        return ListTile(
-                          title: Text(document['title']),
-                          subtitle: Text(document['description']),
-                        );
-                      }
-                    },
-                  );
-                }
-              },
-            );
-          } else {
-            return const Center(
-              child: Text('Failed to fetch workouts'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
             );
           }
         },

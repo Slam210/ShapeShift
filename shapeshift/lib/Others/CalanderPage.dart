@@ -20,11 +20,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _selectedEvents = ValueNotifier([]);
-    _events = {
-      DateTime.utc(2023, 4, 26): [const Event('Event 1')],
-      DateTime.utc(2023, 4, 27): [const Event('Event 2')],
-      DateTime.utc(2023, 4, 26): [const Event('Event 3')],
-    };
+    _events = {};
   }
 
   @override
@@ -66,10 +62,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               },
             ),
-          ),
-          const Image(
-            image: NetworkImage(
-                'https://www.verywellfit.com/thmb/5BmWCs3muNUIJOz_kTsWnmF58sQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Dotdash-VWFit-reasons-to-hire-a-personal-trainer-1231372-v1-c822137213bb460ab973a5d651c31fe7.jpg'),
           ),
         ],
       ),
