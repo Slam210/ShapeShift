@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'HomePage.dart';
+
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
 
@@ -92,7 +94,12 @@ class _SignupPageState extends State<SignupPage> {
               .doc(_username)
               .set({});
         }
-        Navigator.pop(context); // Return to homepage after signing up
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(email: _email),
+          ),
+        ); // Return to homepage after signing up
       } catch (e) {
         if (kDebugMode) {
           print(e.toString());

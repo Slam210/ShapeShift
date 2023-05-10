@@ -127,11 +127,8 @@ class WorkoutsPage extends StatelessWidget {
                                       } else {
                                         final List<DocumentSnapshot>
                                             workoutDocs = snapshot.data!.docs;
-                                        var testing = workoutDocs.length;
-                                        debugPrint(
-                                            'I im logging here $testing');
                                         return ListView.builder(
-                                          itemCount: testing - 1,
+                                          itemCount: workoutDocs.length - 1,
                                           itemBuilder: (context, index) {
                                             final DocumentSnapshot workoutDoc =
                                                 workoutDocs[index];

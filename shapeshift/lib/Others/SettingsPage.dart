@@ -53,35 +53,6 @@ class _SettingsPageState extends State<SettingsPage> {
               title: const Text('Email'),
               subtitle: Text(FirebaseAuth.instance.currentUser!.email ?? ''),
             ),
-            ListTile(
-              title: const Text('Username'),
-              subtitle: TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your username',
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                String newUsername = _usernameController.text.trim();
-                if (newUsername.isNotEmpty) {
-                  // Update username in our db
-                  FirebaseFirestore.instance
-                      .collection('users')
-                      .where((doc) => doc['username'].contains(widget.userId));
-
-                  // Update the username displayed in settings page
-                  setState(() {
-                    widget.userId = newUsername;
-                  });
-
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Cosmetic username updated successfully')));
-                }
-              },
-              child: const Text('Update Username'),
-            ),
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(8.0),

@@ -113,12 +113,16 @@ class _MapPageState extends State<MapPage> {
 
     bool foundUserDoc = false;
     for (final doc in locationsDocs.docs) {
-      final location = doc.get('Location') as GeoPoint;
-      final name = doc.id;
-      stringList.add(name);
-      locationList.add(LatLng(location.latitude, location.longitude));
-      if (doc.id == userId) {
-        foundUserDoc = true;
+      if (doc.exists && doc.data().isNotEmpty) {
+        final location = doc.get('Location') as GeoPoint;
+        final name = doc.id;
+
+        stringList.add(name);
+        locationList.add(LatLng(location.latitude, location.longitude));
+
+        if (doc.id == userId) {
+          foundUserDoc = true;
+        }
       }
     }
 
