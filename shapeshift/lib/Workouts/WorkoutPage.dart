@@ -99,7 +99,6 @@ class WorkoutsPage extends StatelessWidget {
                               .where((doc) => (doc['members'] as List<dynamic>)
                                   .contains(userId))
                               .toList();
-
                       return SizedBox(
                         height: MediaQuery.of(context).size.height *
                             0.35, // Set the height to half the screen height
@@ -132,22 +131,95 @@ class WorkoutsPage extends StatelessWidget {
                                           itemBuilder: (context, index) {
                                             final DocumentSnapshot workoutDoc =
                                                 workoutDocs[index];
-                                            return ListTile(
-                                              title: Text(workoutDoc['title']),
-                                              onTap: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      title: Text(
-                                                          workoutDoc['title']),
-                                                      content: Text(workoutDoc[
-                                                          'description']),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );
+                                            if (workoutDoc.exists &&
+                                                workoutDoc.data() != null &&
+                                                (workoutDoc.data()
+                                                        as Map<String, dynamic>)
+                                                    .isNotEmpty) {
+                                              return Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const SizedBox(height: 16.0),
+                                                  SizedBox(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.35,
+                                                    child: StreamBuilder<
+                                                        QuerySnapshot>(
+                                                      stream: groupDoc.reference
+                                                          .collection(
+                                                              'workouts')
+                                                          .snapshots(),
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        if (!snapshot.hasData) {
+                                                          return const Center(
+                                                            child:
+                                                                CircularProgressIndicator(),
+                                                          );
+                                                        } else {
+                                                          final List<
+                                                                  DocumentSnapshot>
+                                                              workoutDocs =
+                                                              snapshot
+                                                                  .data!.docs;
+                                                          return ListView
+                                                              .builder(
+                                                            itemCount:
+                                                                workoutDocs
+                                                                    .length,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              final DocumentSnapshot
+                                                                  workoutDoc =
+                                                                  workoutDocs[
+                                                                      index];
+                                                              if (workoutDoc
+                                                                      .exists &&
+                                                                  workoutDoc
+                                                                          .data() !=
+                                                                      null &&
+                                                                  (workoutDoc.data() as Map<
+                                                                          String,
+                                                                          dynamic>)
+                                                                      .isNotEmpty) {
+                                                                return ListTile(
+                                                                  title: Text(
+                                                                      workoutDoc[
+                                                                          'title']),
+                                                                  onTap: () {
+                                                                    showDialog(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (context) {
+                                                                        return AlertDialog(
+                                                                          title:
+                                                                              Text(workoutDoc['title']),
+                                                                          content:
+                                                                              Text(workoutDoc['description']),
+                                                                        );
+                                                                      },
+                                                                    );
+                                                                  },
+                                                                );
+                                                              }
+                                                              // Return an empty Container for workouts with no data
+                                                              return Container();
+                                                            },
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            }
+                                            return null;
                                           },
                                         );
                                       }

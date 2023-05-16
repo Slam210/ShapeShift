@@ -40,7 +40,7 @@ dependencies:
   cloud_firestore: ^4.4.5
   firebase_database: ^10.1.1
   uuid: ^3.0.7
-  table_calendar: ^3.0.4
+  table_calendar: ^3.0.8
   google_maps_flutter: ^2.2.5
   geolocator: ^9.0.2
 

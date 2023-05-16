@@ -134,7 +134,6 @@ class _GroupsJoinCreatePageState extends State<GroupsJoinCreatePage> {
                             .doc(groupId)
                             .collection('workouts')
                             .add({});
-
                         // Add an empty locations collection to the newly created group document
                         FirebaseFirestore.instance
                             .collection('Group')

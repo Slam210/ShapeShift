@@ -1,32 +1,28 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, file_names, use_build_context_synchronously
 
+import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key, required this.userId}) : super(key: key);
-
   final String userId;
+
+  const CalendarPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _CalendarPageState createState() => _CalendarPageState();
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  late final ValueNotifier<List<Event>> _selectedEvents;
-  late final Map<DateTime, List<Event>> _events;
-  late final ValueNotifier<DateTime> _selectedDay;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDay = ValueNotifier(DateTime.now());
-    _selectedEvents = ValueNotifier([]);
-    _events = {};
-
-    _fetchEventsFromFirestore();
-  }
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+  LinkedHashMap<DateTime, List<Event>> _events = LinkedHashMap(
+    equals: isSameDay,
+    hashCode: getHashCode,
+  );
 
   void showWorkouts() {
     showDialog(
@@ -65,12 +61,8 @@ class _CalendarPageState extends State<CalendarPage> {
                             return ListTile(
                               title: Text(data[index]),
                               onTap: () {
-                                final DateTime selectedDay = _selectedDay.value;
                                 final String title = data[index];
-
-                                final Event event = Event(selectedDay, title);
-                                addEvent(selectedDay, event);
-
+                                addEventToCalendar(title);
                                 Navigator.pop(context);
                               },
                             );
@@ -136,34 +128,37 @@ class _CalendarPageState extends State<CalendarPage> {
                                                   workoutDocs =
                                                   snapshot.data!.docs;
                                               return ListView.builder(
-                                                shrinkWrap:
-                                                    true, // Add this to wrap the ListView with content
-                                                itemCount:
-                                                    workoutDocs.length - 1,
-                                                itemBuilder: (context, index) {
-                                                  final DocumentSnapshot
-                                                      workoutDoc =
-                                                      workoutDocs[index];
-                                                  return ListTile(
-                                                    title: Text(
-                                                        workoutDoc['title']),
-                                                    onTap: () {
-                                                      final DateTime
-                                                          selectedDay =
-                                                          _selectedDay.value;
-                                                      final String title =
-                                                          workoutDoc['title'];
-
-                                                      final Event event = Event(
-                                                          selectedDay, title);
-                                                      addEvent(
-                                                          selectedDay, event);
-
-                                                      Navigator.pop(context);
-                                                    },
-                                                  );
-                                                },
-                                              );
+                                                  shrinkWrap:
+                                                      true, // Add this to wrap the ListView with content
+                                                  itemCount: workoutDocs.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final DocumentSnapshot
+                                                        workoutDoc =
+                                                        workoutDocs[index];
+                                                    if (workoutDoc.exists &&
+                                                        workoutDoc.data() !=
+                                                            null &&
+                                                        (workoutDoc.data()
+                                                                as Map<String,
+                                                                    dynamic>)
+                                                            .isNotEmpty) {
+                                                      return ListTile(
+                                                        title: Text(workoutDoc[
+                                                            'title']),
+                                                        onTap: () {
+                                                          final String title =
+                                                              workoutDoc[
+                                                                  'title'];
+                                                          addEventToCalendar(
+                                                              title);
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      );
+                                                    }
+                                                    return Container();
+                                                  });
                                             }
                                           },
                                         ),
@@ -193,40 +188,86 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _fetchEventsFromFirestore() {
-    FirebaseFirestore.instance
-        .collection('Calendar')
-        .doc(widget.userId)
-        .get()
-        .then((snapshot) {
-      if (snapshot.exists) {
-        final eventData = snapshot.data() as Map<String, dynamic>;
-        eventData.forEach((key, value) {
-          final DateTime date = DateTime.parse(key);
-          final String title = value.toString();
-          final Event event = Event(date, title);
-
-          setState(() {
-            _events[date] = [...(_events[date] ?? []), event];
-          });
-        });
+  void addEventToCalendar(String workout) async {
+    final newEvent = Event(_selectedDay, workout);
+    setState(() {
+      if (_events.containsKey(_selectedDay)) {
+        _events[_selectedDay]!.add(newEvent);
+      } else {
+        _events[_selectedDay] = [newEvent];
       }
     });
+
+    try {
+      final eventsCollection = FirebaseFirestore.instance
+          .collection('Calendar')
+          .doc(widget.userId)
+          .collection('events');
+
+      await eventsCollection.add({
+        'date': _selectedDay,
+        'title': workout,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error adding event to Firestore: $e');
+      }
+    }
   }
 
-  void addEvent(DateTime date, Event event) {
-    setState(() {
-      _events[date] = [...(_events[date] ?? []), event];
-      _selectedEvents.value = _events[date] ?? [];
-    });
+  @override
+  void initState() {
+    super.initState();
+    _initializeEvents();
+  }
 
-    FirebaseFirestore.instance
-        .collection('Calendar')
-        .doc(widget.userId)
-        .collection('events')
-        .add({
-      'date': date,
-      'title': event.title,
+  void _initializeEvents() async {
+    try {
+      final userId = widget.userId;
+      final eventsSnapshot = await FirebaseFirestore.instance
+          .collection('Calendar')
+          .doc(userId)
+          .collection('events')
+          .get();
+
+      final eventSource = eventsSnapshot.docs.map((doc) {
+        final timestamp = doc['date'] as Timestamp;
+        final title = doc['title'] as String;
+        final date = timestamp.toDate();
+        return Event(date, title);
+      }).toList();
+
+      _events = LinkedHashMap(
+        equals: isSameDay,
+        hashCode: getHashCode,
+      )..addAll({
+          for (var event in eventSource) event.date: [event]
+        });
+
+      setState(() {}); // Update the state after fetching events
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching events: $e');
+      }
+    }
+  }
+
+  List<Event> _getEventsForDay(DateTime day) {
+    return _events[day] ?? [];
+  }
+
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    if (!isSameDay(_selectedDay, selectedDay)) {
+      setState(() {
+        _focusedDay = focusedDay;
+        _selectedDay = selectedDay;
+      });
+    }
+  }
+
+  void _onPageChanged(DateTime focusedDay) {
+    setState(() {
+      _focusedDay = focusedDay;
     });
   }
 
@@ -234,52 +275,70 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar Page'),
+        title: const Text('Calendar'),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            firstDay: DateTime.utc(2020, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
-            focusedDay: _selectedDay.value,
-            selectedDayPredicate: (day) {
-              return isSameDay(day, _selectedDay.value);
-            },
-            eventLoader: (day) => _events[day] ?? [],
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay.value = selectedDay;
-                _selectedEvents.value = _events[selectedDay] ?? [];
-              });
-            },
+      body: Column(children: [
+        TableCalendar(
+          firstDay: DateTime.utc(2021, 1, 1),
+          lastDay: DateTime.utc(2023, 12, 31),
+          focusedDay: _focusedDay,
+          selectedDayPredicate: (day) {
+            // Return true if the day is selected
+            return isSameDay(_selectedDay, day);
+          },
+          calendarFormat: _calendarFormat,
+          onFormatChanged: (format) {
+            setState(() {
+              _calendarFormat = format;
+            });
+          },
+          onDaySelected: _onDaySelected,
+          onPageChanged: _onPageChanged, // Add the onPageChanged callback
+          eventLoader: (day) {
+            return _getEventsForDay(day);
+          },
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: EventListView(
+            selectedDay: _selectedDay,
+            events: _events,
           ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
-              builder: (context, events, _) {
-                if (events.isEmpty) {
-                  return const Center(
-                    child: Text('No events for selected day.'),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(events[index].title),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      ]),
       floatingActionButton: FloatingActionButton(
-        onPressed: showWorkouts,
+        onPressed: () {
+          showWorkouts();
+        },
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class EventListView extends StatelessWidget {
+  final DateTime selectedDay;
+  final LinkedHashMap<DateTime, List<Event>> events;
+
+  const EventListView({
+    super.key,
+    required this.selectedDay,
+    required this.events,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedEvents = events[selectedDay] ?? [];
+
+    return ListView.builder(
+      itemCount: selectedEvents.length,
+      itemBuilder: (context, index) {
+        final event = selectedEvents[index];
+        return ListTile(
+          title: Text(event.title),
+          subtitle: Text(event.date.toString()),
+        );
+      },
     );
   }
 }
@@ -289,4 +348,12 @@ class Event {
   final String title;
 
   Event(this.date, this.title);
+}
+
+bool isSameDay(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+int getHashCode(DateTime key) {
+  return key.year * 10000 + key.month * 100 + key.day;
 }
